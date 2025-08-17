@@ -31,8 +31,8 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: 'Enable Cloud Build API'
-        run: gcloud services enable cloudbuild.googleapis.com
+    #   - name: 'Enable Cloud Build API'
+    #     run: gcloud services enable cloudbuild.googleapis.com
 
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
