@@ -7,31 +7,6 @@ import subprocess
 import time
 import os
 
-# # --- Launch the FastAPI Backend ---
-# # This is the core workaround. It starts the Uvicorn server in a separate process.
-# # We check if it's already running to prevent multiple instances.
-# try:
-#     requests.get("http://localhost:8000")
-#     st.info("FastAPI service is already running.")
-# except requests.exceptions.ConnectionError:
-#     st.info("Starting FastAPI service...")
-    
-#     # Use a subprocess to run the uvicorn command
-#     # `shell=True` is needed for the command to be executed correctly on some systems
-#     p = subprocess.Popen(
-#         [
-#             "uvicorn", "app.main:app", 
-#             "--host", "0.0.0.0", 
-#             "--port", "8000"
-#         ],
-#         cwd=os.getcwd(), # Set the current working directory to the project root
-#     )
-    
-#     # Wait for the server to be ready
-#     time.sleep(5)
-#     st.info("FastAPI service started!")
-
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
