@@ -1,5 +1,4 @@
-
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 
 WORKDIR /app
@@ -15,7 +14,7 @@ COPY . .
 RUN chmod +x ./start.sh
 
 
-EXPOSE 8501
+EXPOSE 8088
 
 
 CMD ["./start.sh"]
