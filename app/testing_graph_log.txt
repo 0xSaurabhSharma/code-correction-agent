@@ -1,0 +1,334 @@
+(re_fast) PS C:\Users\IamSaurabh\Code\A_Projects\code_healing_agent> python -m app.graph
+***********************************
+** Testing Division by Zero      **
+** (Should create new memory)    **
+***********************************
+INFO:app.nodes:Executing arbitrary function.
+ERROR:app.nodes:Function raised an error: division by zero
+INFO:app.nodes:Generating bug report.
+INFO:app.nodes:Generated bug report: ```
+Bug Report:
+
+Summary: Division by zero error encountered.
+
+Function: test_division_by_zero(a, b)
+
+Error Type: ZeroDivisionError
+
+Description: The function attempts to divide a by b. The error arises when b is equal to zero.
+
+Steps to Reproduce:
+
+1. Call test_division_by_zero(a, b)
+2. Set the value of b to 0.
+
+Expected Result:  The function should handle the division by zero case gracefully, either by returning a specific error value (e.g., None, or raising a more informative custom exception) or by avoiding the division operation altogether if b is zero.
+
+Actual Result: The function raises a ZeroDivisionError, terminating execution.
+
+Severity: High (prevents normal function execution)
+
+Workaround: Implement a check to ensure b is not zero before performing the division.  Consider returning a specific value or raising a custom exception to handle the error.
+
+```
+INFO:app.nodes:Searching for relevant bug reports in memory.
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:app.nodes:No similar bug reports found.
+INFO:app.nodes:Generating and saving a new bug report to memory.
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:app.nodes:Saved new bug report to memory with ID: c64fbe1e-f4f4-4c49-ba44-3c92e113e9e3
+INFO:app.nodes:Generating proposed bug fix.
+INFO:app.nodes:Proposed bug fix: ```python
+def test_division_by_zero(a, b):
+    if b == 0:
+        return "Cannot divide by zero"
+    return a / b
+```
+INFO:app.nodes:Applying code patch.
+INFO:app.nodes:Patch successful. Test run result: Cannot divide by zero
+INFO:app.nodes:Executing arbitrary function.
+INFO:app.nodes:Function ran without error. Result: Cannot divide by zero
+
+**************************************
+** Testing Similar Division by Zero **
+** (Should modify existing memory)  **
+**************************************
+INFO:app.nodes:Executing arbitrary function.
+ERROR:app.nodes:Function raised an error: division by zero
+INFO:app.nodes:Generating bug report.
+INFO:app.nodes:Generated bug report: Bug Report:
+
+*   **Subject:** Division by Zero Error in `perform_division` function
+*   **Function:** `perform_division(numerator, denominator)`
+*   **Error Type:** `ZeroDivisionError`
+*   **Description:** The function `perform_division` raises a `ZeroDivisionError` when the `denominator` argument is zero. This results in program termination.
+*   **Steps to Reproduce:**
+    1.  Call the function `perform_division` with any integer value for `numerator`.  
+    2.  Pass the value `0` for the `denominator`.
+    3.  Observe the `ZeroDivisionError` being raised.
+*   **Expected Result:** The function should either handle the division by zero gracefully (e.g., return `None`, raise a custom exception, or display an error message) or have input validation to prevent division by zero.
+*   **Actual Result:** The function raises a `ZeroDivisionError`.
+*   **Severity:** High (causes program termination)
+*   **Suggested Fix:** Implement input validation to check if the `denominator` is zero before performing the division or implement a try-except block to catch and handle the `ZeroDivisionError`.
+INFO:app.nodes:Searching for relevant bug reports in memory.
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:app.nodes:Found 1 similar bug reports.
+INFO:app.nodes:Filtering bug reports.
+INFO:app.nodes:Selected 1 bug reports for modification.
+INFO:app.nodes:Modifying existing bug report in memory.
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:app.nodes:Updated memory with ID: c64fbe1e-f4f4-4c49-ba44-3c92e113e9e3
+INFO:app.nodes:Generating proposed bug fix.
+INFO:app.nodes:Proposed bug fix: ```python
+def perform_division(numerator, denominator):
+    if denominator == 0:
+        return "Cannot divide by zero."
+    return numerator / denominator
+```
+INFO:app.nodes:Applying code patch.
+INFO:app.nodes:Patch successful. Test run result: Cannot divide by zero.
+INFO:app.nodes:Executing arbitrary function.
+INFO:app.nodes:Function ran without error. Result: Cannot divide by zero.
+
+***********************************
+** Testing Dictionary Key Error  **
+***********************************
+INFO:app.nodes:Executing arbitrary function.
+ERROR:app.nodes:Function raised an error: 'city'
+INFO:app.nodes:Generating bug report.
+INFO:app.nodes:Generated bug report: ```
+Bug Report
+
+**1. Summary:** The `get_dict_value` function raised a `KeyError`.
+
+**2. Function:** `get_dict_value(data_dict, key)`
+
+**3. Error Type:** `KeyError`
+
+**4. Error Message:** `'city'`
+
+**5. Input Data:**  (Implicitly: The dictionary passed to `get_dict_value` did not contain the key "city".)
+
+**6. Expected Behavior:** The function should return the value associated with the provided key in the dictionary.
+
+**7. Actual Behavior:** The function raised a `KeyError` because the key 'city' was not found in the input dictionary.
+
+**8. Steps to Reproduce:**
+   a. Call `get_dict_value` with a dictionary that does *not* contain the key "city". 
+   b. Provide "city" as the `key` argument.
+
+**9. Possible Cause:** The code attempts to access a dictionary element using a key that doesn't exist. The dictionary provided as input does not contain a key named 'city'.
+
+**10. Recommended Fix:**  Implement error handling (e.g., using `try...except` block with `KeyError` or using the `get()` method) to gracefully handle cases where the key is missing. For example:
+
+   ```python
+   def get_dict_value(data_dict, key):
+       try:
+           return data_dict[key]
+       except KeyError:
+           return None # or raise a more specific exception, return a default value, etc.
+
+   # or using get()
+   def get_dict_value(data_dict, key):
+       return data_dict.get(key) # returns None if key is not found
+   ```
+```
+INFO:app.nodes:Searching for relevant bug reports in memory.
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:app.nodes:Found 1 similar bug reports.
+INFO:app.nodes:Filtering bug reports.
+INFO:app.nodes:Selected 0 bug reports for modification.
+INFO:app.nodes:Generating and saving a new bug report to memory.
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:app.nodes:Saved new bug report to memory with ID: 63f8f0a4-72a7-4db2-b2d3-a19ab77cf0dc
+INFO:app.nodes:Generating proposed bug fix.
+INFO:app.nodes:Proposed bug fix: ```python
+def get_dict_value(data_dict, key):
+    try:
+        return data_dict[key]
+    except KeyError:
+        return "Key not found"
+```
+INFO:app.nodes:Applying code patch.
+INFO:app.nodes:Patch successful. Test run result: Key not found
+INFO:app.nodes:Executing arbitrary function.
+INFO:app.nodes:Function ran without error. Result: Key not found
+
+***************************************
+** Testing Basic Logic Error         **
+***************************************
+INFO:app.nodes:Executing arbitrary function.
+ERROR:app.nodes:Function raised an error: division by zero
+INFO:app.nodes:Generating bug report.
+INFO:app.nodes:Generated bug report: Bug Report:
+
+*   **Component:** `calculate_average` function
+*   **Functionality:** Calculates the average of a list of numbers.
+*   **Error Type:** `ZeroDivisionError`
+*   **Error Message:** division by zero
+*   **Description:** The function attempts to divide the `total` by zero, leading to a `ZeroDivisionError`.  The intended behavior is to divide by the number of elements in the input list.
+*   **Reproduction Steps:**
+    1.  Call `calculate_average` with any list of numbers (e.g., `calculate_average([1, 2, 3])`).
+    2.  Observe the `ZeroDivisionError`.
+*   **Root Cause:** Incorrect divisor in the return statement. The code divides by `0` instead of `len(numbers)`.
+*   **Proposed Fix:** Change `return total / 0` to `return total / len(numbers)`      
+INFO:app.nodes:Searching for relevant bug reports in memory.
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:app.nodes:Found 2 similar bug reports.
+INFO:app.nodes:Filtering bug reports.
+INFO:app.nodes:Selected 0 bug reports for modification.
+INFO:app.nodes:Generating and saving a new bug report to memory.
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:app.nodes:Saved new bug report to memory with ID: be8214ed-4589-478c-aa3c-fd03e9c8a739
+INFO:app.nodes:Generating proposed bug fix.
+INFO:app.nodes:Proposed bug fix: ```python
+def calculate_average(numbers):
+    total = 0
+    for num in numbers:
+        total += num
+    if len(numbers) == 0:
+        return "Cannot calculate average of an empty list"
+    else:
+        return total / len(numbers)
+```
+INFO:app.nodes:Applying code patch.
+INFO:app.nodes:Patch successful. Test run result: 20.0
+INFO:app.nodes:Executing arbitrary function.
+INFO:app.nodes:Function ran without error. Result: 20.0
+
+*******************************************
+** Testing Data Type Mismatch            **
+*******************************************
+INFO:app.nodes:Executing arbitrary function.
+ERROR:app.nodes:Function raised an error: 'int' object has no attribute 'upper'       
+INFO:app.nodes:Generating bug report.
+INFO:app.nodes:Generated bug report: Bug Report:
+
+**Summary:** The `concatenate_strings` function fails when the second argument (`s2`) is an integer, resulting in an `AttributeError: 'int' object has no attribute 'upper'`. The function attempts to call the `.upper()` method on an integer, which is not supported.
+
+**Environment:** Python
+
+**Steps to Reproduce:**
+
+1.  Call the `concatenate_strings` function with a string as the first argument and an integer as the second argument. For example: `concatenate_strings("hello", 123)`.    
+
+**Expected Result:** A string concatenating the first string, a space, and the second string converted to uppercase.  (e.g., "hello 123" if the integer conversion is handled, or "hello 123.0" if a float conversion is handled)
+
+**Actual Result:** An `AttributeError: 'int' object has no attribute 'upper'`.        
+
+**Proposed Solution:** Validate the type of `s2` before calling `.upper()`. If `s2` is not a string, either raise a `TypeError`, convert `s2` to a string using `str(s2)` before calling `.upper()`, or handle the conversion to uppercase differently.
+INFO:app.nodes:Searching for relevant bug reports in memory.
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:app.nodes:Found 3 similar bug reports.
+INFO:app.nodes:Filtering bug reports.
+INFO:app.nodes:Selected 0 bug reports for modification.
+INFO:app.nodes:Generating and saving a new bug report to memory.
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:app.nodes:Saved new bug report to memory with ID: 08abb9ca-a0f2-4ae6-abcb-3e445fd92ebd
+INFO:app.nodes:Generating proposed bug fix.
+INFO:app.nodes:Proposed bug fix: ```python
+def concatenate_strings(s1, s2):
+    if not isinstance(s2, str):
+        return "Error: s2 must be a string"
+    return s1 + " " + s2.upper()
+```
+INFO:app.nodes:Applying code patch.
+INFO:app.nodes:Patch successful. Test run result: Error: s2 must be a string
+INFO:app.nodes:Executing arbitrary function.
+INFO:app.nodes:Function ran without error. Result: Error: s2 must be a string
+
+***************************************
+** Testing Edge Case (Empty List)    **
+***************************************
+INFO:app.nodes:Executing arbitrary function.
+ERROR:app.nodes:Function raised an error: list index out of range
+INFO:app.nodes:Generating bug report.
+INFO:app.nodes:Generated bug report: Bug Report:
+
+*   **Component:** get\_first\_element function
+*   **Severity:** Critical (function fails to operate as intended)
+*   **Description:** The function `get_first_element` raises a `list index out of range` error. This occurs when the input list `my_list` is empty. The function attempts to access the element at index 0, which is invalid for an empty list.
+*   **Reproduction Steps:**
+    1.  Call the function `get_first_element` with an empty list as input: `get_first_element([])`.
+    2.  The error will be raised.
+*   **Expected Result:** The function should handle empty lists gracefully, either by returning `None`, raising a more informative exception (e.g., `ValueError`), or returning a default value. It should not crash the program.
+*   **Actual Result:** The function raises a `list index out of range` error, terminating the program.
+*   **Suggested Fix:** Implement a check to verify that the input list is not empty before accessing the first element. Example fix:
+
+    ```python
+    def get_first_element(my_list):
+        if not my_list:
+            return None # Or raise ValueError, or return a default
+        return my_list[0]
+    ```
+*   **Environment:** Python (any version)
+INFO:app.nodes:Searching for relevant bug reports in memory.
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:app.nodes:Found 4 similar bug reports.
+INFO:app.nodes:Filtering bug reports.
+INFO:app.nodes:Selected 0 bug reports for modification.
+INFO:app.nodes:Generating and saving a new bug report to memory.
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:app.nodes:Saved new bug report to memory with ID: 1b8e2ac6-ac41-42a9-b9e5-7cd1a0acc7a5
+INFO:app.nodes:Generating proposed bug fix.
+INFO:app.nodes:Proposed bug fix: ```python
+def get_first_element(my_list):
+    if not my_list:
+        return "Error: list is empty"
+    return my_list[0]
+```
+INFO:app.nodes:Applying code patch.
+INFO:app.nodes:Patch successful. Test run result: Error: list is empty
+INFO:app.nodes:Executing arbitrary function.
+INFO:app.nodes:Function ran without error. Result: Error: list is empty
+
+*******************************************
+** Testing Recursive Function Bug        **
+*******************************************
+INFO:app.nodes:Executing arbitrary function.
+ERROR:app.nodes:Function raised an error: maximum recursion depth exceeded
+INFO:app.nodes:Generating bug report.
+INFO:app.nodes:Generated bug report: ```
+Bug Report
+
+**Subject:** Infinite Recursion in `sum_to_n` Function
+
+**Function:** `sum_to_n(n)`
+
+**Error:** `RecursionError: maximum recursion depth exceeded`
+
+**Description:** The function is intended to calculate the sum of integers from 1 to `n`. However, due to a recursive call within the function that doesn't have a proper base case, it results in infinite recursion when `n` is a positive integer.  The function calls itself repeatedly without ever reaching the stopping condition (n <= 0), eventually exceeding Python's maximum recursion depth.
+
+**Reproduction Steps:**
+
+1.  Call `sum_to_n(n)` with any positive integer value for `n` (e.g., `sum_to_n(5)`). 
+
+**Expected Result:**  The function should calculate the sum of numbers from 1 to `n`. 
+
+**Actual Result:**  `RecursionError: maximum recursion depth exceeded` is raised.     
+
+**Root Cause:** Incorrect recursive implementation. The base case `if n <= 0: return 0` is correct, but the recursive call `return n + sum_to_n(n)` does not decrement `n` towards the base case.  It calls the function with the same value of `n` indefinitely. 
+
+**Proposed Solution:**  The recursive call should decrement `n` to eventually reach the base case:  `return n + sum_to_n(n - 1)`
+```
+INFO:app.nodes:Searching for relevant bug reports in memory.
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:app.nodes:Found 5 similar bug reports.
+INFO:app.nodes:Filtering bug reports.
+INFO:app.nodes:Selected 0 bug reports for modification.
+INFO:app.nodes:Generating and saving a new bug report to memory.
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+INFO:app.nodes:Saved new bug report to memory with ID: 7cb31da6-d088-4902-9368-881d0dee00c3
+INFO:app.nodes:Generating proposed bug fix.
+INFO:app.nodes:Proposed bug fix: ```python
+def sum_to_n(n):
+    if n <= 0:
+        return 0
+    else:
+        return n * (n + 1) // 2
+```
+INFO:app.nodes:Applying code patch.
+INFO:app.nodes:Patch successful. Test run result: 15
+INFO:app.nodes:Executing arbitrary function.
+INFO:app.nodes:Function ran without error. Result: 15
+(re_fast) PS C:\Users\IamSaurabh\Code\A_Projects\code_healing_agent> 

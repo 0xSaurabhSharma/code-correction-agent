@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+langgraph
+langchain-core
+langchain-openai
+chromadb
+pydantic
+pydantic-settings
+streamlit
+langchain-chroma
+langchain-google-genai
+langchain-groq
+python-dotenv

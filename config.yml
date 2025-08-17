@@ -1,0 +1,23 @@
+embedding_model:
+  default_provider: "google"
+  providers:
+    google:
+      model_name: "models/text-embedding-004"
+    openai:
+      model_name: "text-embedding-ada-002"
+
+
+llm:
+  default_provider: "google" 
+  providers:
+    google:
+      model_name: "gemini-2.0-flash-lite"
+    groq:
+      model_name: "deepseek-r1-distill-llama-70b"
+    openai:
+      model_name: "gpt-4o-mini"
+
+
+safeguard:
+    groq:
+      model_name: "meta-llama/llama-guard-4-12b"
