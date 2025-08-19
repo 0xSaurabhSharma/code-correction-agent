@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Self-Healing Code Agent</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <style>
+    :root { color-scheme: light dark; }
+    html { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
+    .glass { backdrop-filter: blur(8px); }
+    pre code { white-space: pre-wrap; word-wrap: break-word; }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 text-slate-800 dark:text-slate-100">
+
+  <header class="sticky top-0 z-30 bg-white/70 dark:bg-slate-950/50 glass border-b border-slate-200/70 dark:border-slate-800/70">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-9 w-9 rounded-2xl bg-slate-900 dark:bg-white flex items-center justify-center text-white dark:text-slate-900 font-bold">🤖</div>
+        <div>
+          <h1 class="text-lg font-semibold">Self-Healing Code Agent</h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Run a Python function • Auto-diagnose • Patch • Report</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 text-xs text-slate-500">
+        <span class="hidden sm:block">Status:</span>
+        <span id="statusDot" class="inline-flex h-2.5 w-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+        <span id="statusText">Not connected</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+    <div class="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 bg-white/60 dark:bg-slate-950/40 glass text-sm" id="configNotice">
+      <strong>Heads up:</strong> you can edit API base and endpoint in the page (or in main.py render args).
+    </div>
+
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="space-y-4">
+        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/40 glass p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="text-base font-semibold">Python Function</h2>
+            <button id="btnSample" class="text-xs px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">Load sample</button>
+          </div>
+          <label class="text-xs text-slate-500">Paste your function (one function per run)</label>
+          <textarea id="functionInput" class="mt-2 w-full h-60 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 font-mono text-sm" spellcheck="false">def divide_numbers(a, b):
+    return a / b</textarea>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/40 glass p-5 shadow-sm">
+          <h2 class="text-base font-semibold mb-2">Arguments (JSON array)</h2>
+          <label class="text-xs text-slate-500">Example: <code>[10, 0]</code></label>
+          <textarea id="argsInput" class="mt-2 w-full h-32 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 font-mono text-sm" spellcheck="false">[10, 0]</textarea>
+          <p id="argsError" class="mt-2 text-xs text-rose-600 hidden">Invalid JSON. Please provide a valid JSON array.</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button id="btnRun" class="px-5 py-2.5 rounded-2xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-medium shadow hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed">Run Agent</button>
+          <button id="btnClear" class="px-4 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">Clear</button>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/40 glass p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <h2 class="text-base font-semibold">Run Output</h2>
+            <div class="flex items-center gap-2 text-xs">
+              <span id="runBadge" class="hidden px-2 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800">Idle</span>
+              <button id="btnCopyAll" class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800">Copy report</button>
+            </div>
+          </div>
+
+          <div id="resultsPanel" class="mt-3 space-y-4">
+            <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+              <p class="text-sm font-medium mb-1">Original Function</p>
+              <pre class="overflow-x-auto"><code id="codeOriginal" class="language-python"></code></pre>
+            </div>
+
+            <div id="patchedWrap" class="hidden rounded-xl border border-emerald-200 dark:border-emerald-800 p-3 bg-emerald-50/60 dark:bg-emerald-900/20">
+              <p class="text-sm font-medium mb-1">Patched Function</p>
+              <pre class="overflow-x-auto"><code id="codePatched" class="language-python"></code></pre>
+            </div>
+
+            <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+              <p class="text-sm font-medium mb-1">Final Result</p>
+              <div id="finalResult" class="text-sm text-slate-700 dark:text-slate-300">–</div>
+            </div>
+
+            <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+              <p class="text-sm font-medium mb-1">Bug Report</p>
+              <pre class="overflow-x-auto"><code id="bugReport" class="language-text"></code></pre>
+            </div>
+
+            <div id="errorWrap" class="hidden rounded-xl border border-rose-200 dark:border-rose-900 p-3 bg-rose-50/60 dark:bg-rose-950/40">
+              <p class="text-sm font-semibold text-rose-700 dark:text-rose-300 mb-1">Error</p>
+              <div id="finalError" class="text-sm"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/40 glass p-4 text-xs text-slate-500">
+          <p>Tip: UI expects run endpoint at <code id="hintEndpoint"></code>. Edit main.py render args to change.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-slate-900 text-white text-sm shadow-lg hidden">Copied!</div>
+
+  <script>
+    // Injected by Jinja2
+    const API_BASE = "{{ api_base }}";
+    const RUN_ENDPOINT = "{{ run_endpoint }}";
+
+    const qs  = (sel) => document.querySelector(sel)
+    const qsa = (sel) => Array.from(document.querySelectorAll(sel))
+
+    const statusDot  = qs('#statusDot')
+    const statusText = qs('#statusText')
+    const argsError  = qs('#argsError')
+    const btnRun     = qs('#btnRun')
+    const btnClear   = qs('#btnClear')
+    const btnSample  = qs('#btnSample')
+    const btnCopyAll = qs('#btnCopyAll')
+
+    const codeOriginal = qs('#codeOriginal')
+    const codePatched  = qs('#codePatched')
+    const patchedWrap  = qs('#patchedWrap')
+    const finalResult  = qs('#finalResult')
+    const bugReport    = qs('#bugReport')
+    const errorWrap    = qs('#errorWrap')
+    const finalError   = qs('#finalError')
+
+    const functionInput = qs('#functionInput')
+    const argsInput     = qs('#argsInput')
+    const hintEndpoint   = qs('#hintEndpoint')
+
+    function setStatus(ok, text) {
+      statusDot.className = 'inline-flex h-2.5 w-2.5 rounded-full ' + (ok ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse')
+      statusText.textContent = text || (ok ? 'Healthy' : 'Not connected')
+    }
+
+    async function checkHealth() {
+      try {
+        const res = await fetch(API_BASE + '/health')
+        if (res.ok) { setStatus(true, 'Healthy'); qs('#configNotice').classList.add('hidden') } else { setStatus(false) }
+      } catch { setStatus(false) }
+    }
+    checkHealth()
+
+    function showToast(msg = 'Copied!') {
+      const t = qs('#toast')
+      t.textContent = msg
+      t.classList.remove('hidden')
+      setTimeout(() => t.classList.add('hidden'), 1200)
+    }
+
+    function safeJSONParse(str) {
+      try { return [JSON.parse(str), null] } catch (e) { return [null, e] }
+    }
+
+    function highlightAll() { qsa('pre code').forEach(el => hljs.highlightElement(el)) }
+
+    function resetResults() {
+      codeOriginal.textContent = ''
+      codePatched.textContent  = ''
+      patchedWrap.classList.add('hidden')
+      finalResult.textContent  = '–'
+      bugReport.textContent    = ''
+      finalError.textContent   = ''
+      errorWrap.classList.add('hidden')
+      highlightAll()
+    }
+
+    function collectPayload() {
+      const fn = functionInput.value.trim()
+      const [args, err] = safeJSONParse(argsInput.value.trim() || '[]')
+      if (err || !Array.isArray(args)) {
+        argsError.classList.remove('hidden')
+        return [null, 'Invalid JSON for arguments. Provide an array.']
+      }
+      argsError.classList.add('hidden')
+      return [{ function_string: fn, arguments: args }, null]
+    }
+
+    function mapResponseToUI(data) {
+      const original = data.original_function_string || data.function_string || ''
+      const patched  = data.new_function_string || ''
+      const result   = data.result !== undefined ? data.result : (data.error ? '—' : 'No result returned.')
+      const bug      = data.bug_report || 'No bug report generated.'
+      const err      = data.error_description || data.error || ''
+
+      codeOriginal.textContent = original
+      if (patched && patched !== original) {
+        codePatched.textContent = patched
+        patchedWrap.classList.remove('hidden')
+      } else {
+        patchedWrap.classList.add('hidden')
+      }
+      finalResult.textContent = typeof result === 'object' ? JSON.stringify(result) : String(result)
+      bugReport.textContent = bug
+
+      if (err) {
+        errorWrap.classList.remove('hidden')
+        finalError.textContent = err
+      } else {
+        errorWrap.classList.add('hidden')
+      }
+
+      highlightAll()
+    }
+
+    async function handleRun() {
+      resetResults()
+      const [payload, err] = collectPayload()
+      if (err) { return }
+
+      btnRun.disabled = true
+      btnRun.textContent = 'Running…'
+
+      try {
+        const res = await fetch(API_BASE + RUN_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+
+        if (!res.ok) {
+          const txt = await res.text()
+          throw new Error(`HTTP ${res.status}: ${txt}`)
+        }
+
+        const data = await res.json()
+        mapResponseToUI(data)
+      } catch (e) {
+        errorWrap.classList.remove('hidden')
+        finalError.textContent = e.message || String(e)
+      } finally {
+        btnRun.disabled = false
+        btnRun.textContent = 'Run Agent'
+      }
+    }
+
+    btnRun.addEventListener('click', handleRun)
+    btnClear.addEventListener('click', () => {
+      functionInput.value = ''
+      argsInput.value = '[]'
+      resetResults()
+    })
+    btnSample.addEventListener('click', () => {
+      functionInput.value = `def divide_numbers(a, b):
+    return a / b`
+      argsInput.value = '[10, 0]'
+      resetResults()
+    })
+    btnCopyAll.addEventListener('click', async () => {
+      const all = [
+        '# Original Function\n', codeOriginal.textContent, '\n\n',
+        '# Patched Function\n', codePatched.textContent || '(none)', '\n\n',
+        '# Final Result\n', finalResult.textContent, '\n\n',
+        '# Bug Report\n', bugReport.textContent
+      ].join('')
+      try { await navigator.clipboard.writeText(all); showToast('Report copied') } catch { showToast('Could not copy') }
+    })
+
+    // Show endpoint hint inside UI
+    hintEndpoint.textContent = RUN_ENDPOINT
+
+    highlightAll()
+  </script>
+</body>
+</html>
