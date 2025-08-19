@@ -2,7 +2,8 @@
 import uvicorn
 import os
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI, Request     # <-- ensure Request is imported
+from fastapi.templating import Jinja2Templates
 from app.settings_loader import settings
 from app.api import router
 
@@ -17,12 +18,23 @@ app = FastAPI(
     version="1.0.0",
 )
 
+templates = Jinja2Templates(directory="templates")
 
 app.include_router(router)
 
-@app.get("/")
-def root():
-    return {"message": "Welcome to the Self-Healing Code Agent API!"}
+@app.get("/")   # serve the UI on the root path
+def root(request: Request):
+    """
+    Renders the single-file UI placed at templates/index.html.
+    api_base and run_endpoint are passed so you can tweak without editing JS.
+    """
+    # Serve UI with empty API_BASE so frontend uses same-origin relative paths.
+    return templates.TemplateResponse("index.html", {"request": request, "api_base": "", "run_endpoint": "/run_agent"})
+    # return templates.TemplateResponse("index.html", {"request": request, "api_base": "", "run_endpoint": "/agent/run"})
+
+# @app.get("/")
+# def root():
+#     return {"message": "Welcome to the Self-Healing Code Agent API!"}
 
 @app.get("/health")
 def health_check():

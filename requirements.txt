@@ -11,3 +11,4 @@ langchain-chroma
 langchain-google-genai
 langchain-groq
 python-dotenv
+jinja2
