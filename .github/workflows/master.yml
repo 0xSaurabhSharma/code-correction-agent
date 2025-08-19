@@ -7,41 +7,76 @@ on:
       - master
 
 env:
-  SERVICE_NAME: code-correction-agent-poc
+  PROJECT_ID: agentic-trading-bot-469202  
   REGION: asia-south1
-  PROJECT_ID: agentic-trading-bot-469202
+  REPO: code-healing-repo   
+  SERVICE: code-healing-api 
+  IMAGE: code-healing-image 
 
 permissions:
   contents: read
   id-token: write
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
+      # Authenticate to GCP using the service account key stored as a secret
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Set up Cloud SDK
+      # Install and configure the gcloud CLI
+      - name: Setup gcloud CLI
         uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          
+      # Configure Docker to authenticate to Google Artifact Registry
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
+        env:
+          REGION: ${{ env.REGION }}
 
-      - name: Deploy to Cloud Run
+      # Build and push the Docker image to the Artifact Registry
+      - name: Build and push Docker image
+        run: |
+          IMAGE_URI=${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO}/${IMAGE}:latest
+          docker build -t $IMAGE_URI .
+          docker push $IMAGE_URI
+        env:
+          PROJECT_ID: ${{ env.PROJECT_ID }}
+          REGION: ${{ env.REGION }}
+          REPO: ${{ env.REPO }}
+          IMAGE: ${{ env.IMAGE }}
+
+      # Deploy the image to Cloud Run
+      - name: Deploy to Cloud Run (with runtime env vars)
         uses: google-github-actions/deploy-cloudrun@v2
         with:
-          service: ${{ env.SERVICE_NAME }}
-          source: .
+          service: ${{ env.SERVICE }}
+          image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.IMAGE }}:latest
           region: ${{ env.REGION }}
           project_id: ${{ env.PROJECT_ID }}
-          flags: "--allow-unauthenticated"
+          allow_unauthenticated: true
           env_vars: |
             OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
             LANGSMITH_TRACING_V2=true
             LANGSMITH_ENDPOINT=https://api.smith.langchain.com
             LANGSMITH_API_KEY=${{ secrets.LANGSMITH_API_KEY }}
             LANGSMITH_PROJECT=${{ secrets.LANGSMITH_PROJECT }}
+      
+      # Show the deployed service URL for easy access
+      - name: Show deployed service URL
+        run: |
+          gcloud run services describe ${SERVICE} --region ${REGION} --project ${PROJECT_ID} --format="value(status.url)"
+        env:
+          PROJECT_ID: ${{ env.PROJECT_ID }}
+          REGION: ${{ env.REGION }}
+          SERVICE: ${{ env.SERVICE }}
