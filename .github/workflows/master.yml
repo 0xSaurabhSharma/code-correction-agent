@@ -7,11 +7,11 @@ on:
       - master
 
 env:
-  PROJECT_ID: agentic-trading-bot-469202  
   REGION: asia-south1
-  REPO: code-healing-repo   
-  SERVICE: code-healing-api 
-  IMAGE: code-healing-image 
+  PROJECT_ID: agentic-trading-bot-469202
+  SERVICE: github-action-service
+  REPO: cloud-run-source-deploy
+  IMAGE: code-correction-agent-poc
 
 permissions:
   contents: read
