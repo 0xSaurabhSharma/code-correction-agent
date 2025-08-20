@@ -1,37 +1,67 @@
-# File: Dockerfile
-# Stage 1: Build the wheel and install dependencies
-FROM python:3.11-slim as builder
+# Dockerfile (updated for your project structure)
+# - two-stage build: build wheels in builder, install in final image
+# - defaults PORT=8080 (Cloud Run friendly), but you can override it
+# - copies entire repo into /app (keeps templates/, app/, main.py, etc)
 
-# Set the working directory in the container
-WORKDIR /app
+# -----------------------
+# Stage 1: build wheels
+# -----------------------
+    FROM python:3.11-slim AS builder
 
-# Install build dependencies
-RUN apt-get update && apt-get install --no-install-recommends -y \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy requirements.txt and install Python dependencies
-COPY requirements.txt .
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
-
-
-# Stage 2: Create the final production image
-FROM python:3.11-slim
-
-# Set the working directory in the container
-WORKDIR /app
-
-# Copy the wheels from the builder stage and install them
-COPY --from=builder /usr/src/app/wheels /wheels
-COPY --from=builder /usr/src/app/requirements.txt .
-RUN pip install --no-cache-dir --no-deps /wheels/*
-
-# Copy the rest of the application source code
-COPY . .
-
-# Expose the port the app will run on
-EXPOSE 8080
-
-# Command to run the application using Uvicorn
-# We use an import string to run the app.
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+    ENV PYTHONUNBUFFERED=1 \
+        PIP_NO_CACHE_DIR=1
+    
+    WORKDIR /app
+    
+    # Install build tools required for many Python packages
+    RUN apt-get update \
+        && apt-get install --no-install-recommends -y \
+           build-essential \
+           gcc \
+           git \
+           libffi-dev \
+           libssl-dev \
+           make \
+        && rm -rf /var/lib/apt/lists/*
+    
+    # Copy only requirements first to leverage Docker cache
+    COPY requirements.txt /app/requirements.txt
+    
+    # Build wheels into /wheels (faster subsequent installs)
+    RUN python -m pip install --upgrade pip setuptools wheel \
+     && pip wheel --no-cache-dir --wheel-dir /wheels -r /app/requirements.txt
+    
+    # -----------------------
+    # Stage 2: runtime image
+    # -----------------------
+    FROM python:3.11-slim
+    
+    ENV PYTHONUNBUFFERED=1 \
+        PIP_NO_CACHE_DIR=1 \
+        PORT=8080
+    
+    WORKDIR /app
+    
+    # (Optional) install runtime system deps if any are needed at runtime.
+    # Add packages if your app needs them (e.g. libpq5 for psycopg2 runtime)
+    RUN apt-get update \
+      && apt-get install --no-install-recommends -y ca-certificates \
+      && rm -rf /var/lib/apt/lists/*
+    
+    # Copy pre-built wheels and requirements file from builder
+    COPY --from=builder /wheels /wheels
+    COPY --from=builder /app/requirements.txt /app/requirements.txt
+    
+    # Install wheels (no network access required at this step)
+    RUN pip install --no-cache-dir /wheels/*
+    
+    # Copy application code (templates/, app/, main.py, etc)
+    COPY . /app
+    
+    # Expose default port (Cloud Run uses 8080 by convention)
+    EXPOSE 8080
+    
+    # Use sh -c so we can expand ${PORT} environment variable at runtime.
+    # Production: remove --reload and consider adding --workers N
+    CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT}"]
+    
