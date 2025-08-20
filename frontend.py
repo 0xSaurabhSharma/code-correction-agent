@@ -39,7 +39,7 @@ arguments_string = st.text_area(
 # --- Determine the API URL dynamically ---
 # In a single container, the FastAPI service runs on localhost
 # On your local machine, it's also localhost
-BASE_URL = "http://localhost:8000"
+BASE_URL = "http://localhost:8080"
 
 # Button to trigger the agent
 if st.button("Run Agent", type="primary"):
