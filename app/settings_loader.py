@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     LANGSMITH_API_KEY: Optional[str] = None
     LANGSMITH_PROJECT: Optional[str] = None
     
+    PORT: int = 8080
 
     @model_validator(mode='after')
     def _check_langsmith_settings(self) -> 'Settings':

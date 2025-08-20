@@ -8,6 +8,11 @@ from app.settings_loader import settings
 from app.api import router
 
 
+os.environ['LANGSMITH_TRACING_V2'] = settings.LANGSMITH_TRACING_V2
+os.environ['LANGSMITH_ENDPOINT'] = settings.LANGSMITH_ENDPOINT
+os.environ['LANGSMITH_API_KEY'] = settings.LANGSMITH_API_KEY
+os.environ['LANGSMITH_PROJECT'] = settings.LANGSMITH_PROJECT
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -42,11 +47,8 @@ def health_check():
 
 if __name__ == "__main__":
     
-    os.environ['LANGSMITH_TRACING_V2'] = settings.LANGSMITH_TRACING_V2
-    os.environ['LANGSMITH_ENDPOINT'] = settings.LANGSMITH_ENDPOINT
-    os.environ['LANGSMITH_API_KEY'] = settings.LANGSMITH_API_KEY
-    os.environ['LANGSMITH_PROJECT'] = settings.LANGSMITH_PROJECT
     
+    port = int(settings.PORT)
     
-    uvicorn.run(app, host="0.0.0.0", port=8080, reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=port, reload=True)
 
