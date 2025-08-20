@@ -63,4 +63,4 @@
     
     # Use sh -c so we can expand ${PORT} environment variable at runtime.
     # Production: remove --reload and consider adding --workers N
-    CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+    CMD exec uvicorn main:app --host 0.0.0.0 --port ${PORT}

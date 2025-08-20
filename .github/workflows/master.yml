@@ -64,13 +64,16 @@ jobs:
           image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.IMAGE }}:latest
           region: ${{ env.REGION }}
           project_id: ${{ env.PROJECT_ID }}
-          allow_unauthenticated: true
+          flags: "--allow-unauthenticated"
           env_vars: |
             OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
             LANGSMITH_TRACING_V2=true
             LANGSMITH_ENDPOINT=https://api.smith.langchain.com
             LANGSMITH_API_KEY=${{ secrets.LANGSMITH_API_KEY }}
             LANGSMITH_PROJECT=${{ secrets.LANGSMITH_PROJECT }}
+            GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
+            GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
+
       
       # Show the deployed service URL for easy access
       - name: Show deployed service URL
